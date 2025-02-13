@@ -4,6 +4,12 @@ provider "google" {
   region  = var.region
 }
 
+provider "cato" {
+  baseurl    = var.baseurl
+  token      = var.token
+  account_id = var.account_id
+}
+
 # # Data sources to fetch existing resources
 # data "google_compute_network" "existing_vpc_mgmt" {
 #   name = var.existing_vpc_mgmt_name
@@ -42,6 +48,23 @@ provider "google" {
 #   region = var.region
 # }
 
+resource "cato_socket_site" "gcp-site" {
+  connection_type = var.connection_type
+  description     = var.site_description
+  name            = var.site_name
+  native_range = {
+    native_network_range = var.native_network_range
+    local_ip             = var.lan_network_ip
+  }
+  site_location = var.site_location
+  site_type     = var.site_type
+}
+
+data "cato_accountSnapshotSite" "gcp-site" {
+  id = cato_socket_site.gcp-site.id
+}
+
+
 # firewall.tf
 resource "google_compute_firewall" "allow_ssh_https" {
   count   = var.create_firewall_rule ? 1 : 0
@@ -54,7 +77,10 @@ resource "google_compute_firewall" "allow_ssh_https" {
   }
 
   source_ranges = var.management_source_ranges
-  target_tags   = ["vsocket"]
+  target_tags = var.tags
+  # labels = merge(var.labels,{
+  #   Name = "${var.site_name}-vSocket-fw-rule"
+  # })
 }
 
 # Boot disk
@@ -64,6 +90,9 @@ resource "google_compute_disk" "boot_disk" {
   zone  = var.zone
   size  = var.boot_disk_size
   image = var.boot_disk_image
+  # tags = merge(var.tags,{
+  #   Name = "${var.site_name}-vSocket"
+  # })
 }
 
 # VM Instance
@@ -121,7 +150,7 @@ resource "google_compute_instance" "vsocket" {
 
   # Custom metadata with serial id
   metadata = {
-    cato-serial-id = var.cato-serial-id
+    cato-serial-id = data.cato_accountSnapshotSite.gcp-site.info.sockets[0].serial
   }
 
   scheduling {
@@ -133,5 +162,8 @@ resource "google_compute_instance" "vsocket" {
     scopes = ["https://www.googleapis.com/auth/cloud-platform"]
   }
 
-  tags = ["vsocket"]
+  tags = var.tags
+  labels = merge(var.labels,{
+    name = lower("${var.site_name}-vsocket")
+  })
 }

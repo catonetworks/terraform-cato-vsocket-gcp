@@ -1,3 +1,63 @@
+# Cato site variables:
+variable "baseurl" {
+  description = "Cato API base URL"
+  type        = string
+  default     = "https://api.catonetworks.com/api/v1/graphql2"
+}
+
+variable "token" {
+  description = "Cato API token"
+  type        = string
+}
+
+variable "account_id" {
+  description = "Cato account ID"
+  type        = number
+}
+
+variable "site_name" {
+  description = "Name of the vsocket site"
+  type        = string
+}
+
+variable "site_description" {
+  description = "Description of the vsocket site"
+  type        = string
+}
+
+variable "site_type" {
+  description = "The type of the site"
+  type        = string
+  default     = "CLOUD_DC"
+  validation {
+    condition     = contains(["DATACENTER", "BRANCH", "CLOUD_DC", "HEADQUARTERS"], var.site_type)
+    error_message = "The site_type variable must be one of 'DATACENTER','BRANCH','CLOUD_DC','HEADQUARTERS'."
+  }
+}
+
+variable "site_location" {
+  type = object({
+    city         = string
+    country_code = string
+    state_code   = string
+    timezone     = string
+  })
+}
+
+variable "connection_type" {
+  description = "Model of Cato vsocket"
+  type        = string
+  default     = "SOCKET_GCP1500"
+}
+
+variable "native_network_range" {
+  type        = string
+  description = <<EOT
+  	Choose the unique network range your vpc is configured with for your socket that does not conflict with the rest of your Wide Area Network.
+    The accepted input format is Standard CIDR Notation, e.g. X.X.X.X/X
+	EOT
+}
+
 # variables.tf
 variable "project" {
   description = "GCP Project ID"
@@ -77,6 +137,7 @@ variable "boot_disk_size" {
 variable "boot_disk_image" {
   description = "Boot disk image"
   type        = string
+  default     = "image-production-socket-v22-0-20241231-19122"
 }
 
 variable "network_tier" {
@@ -122,16 +183,7 @@ variable "machine_type" {
     condition     = can(regex("^[a-z][0-9]-[a-z]+-[0-9]+$", var.machine_type))
     error_message = "Machine type must be in the format: family-series-size (e.g., n2-standard-4)."
   }
-}
-
-# Metadata Configuration
-variable "cato-serial-id" {
-  description = "Serial ID for the metadata (Required)"
-  type        = string
-  validation {
-    condition     = length(var.cato-serial-id) > 0
-    error_message = "The cato-serial-id value is required and cannot be empty."
-  }
+  default     =  "n2-standard-4"
 }
 
 # Public IP Configuration
@@ -179,4 +231,16 @@ variable "create_firewall_rule" {
   description = "Whether to create the firewall rule for management access"
   type        = bool
   default     = true
+}
+
+variable "labels" {
+  description = "Labels to be appended to GCP resources"
+  type        = map(string)
+  default     = {}
+}
+
+variable "tags" {
+  description = "Tags to be appended to GCP resources"
+  type        = list(string)
+  default     = []
 }

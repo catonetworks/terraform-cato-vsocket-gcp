@@ -5,3 +5,8 @@
 ### Features
 - Initial commit with single socket instance with 3 NICs 
 - Added default values for required parameters
+
+## 0.0.2 (2025-02-13)
+
+### Features
+- Added support for tags and labels

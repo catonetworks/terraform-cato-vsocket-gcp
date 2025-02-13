@@ -6,7 +6,7 @@ The Cato vSocket modules deploys a vSocket instance to connect to the Cato Cloud
 - Install the [Google Cloud Platform CLI](https://cloud.google.com/sdk/docs/install)
 `$ /google-cloud-sdk/install.sh`
 - Run the following to configure the GCP CLI
-`$ cloud auth application-default login`
+`$ gcloud auth application-default login`
 
 This module deploys the following resources
 - 1 google_compute_instance
@@ -19,28 +19,39 @@ This module deploys the following resources
 # GCP/Cato vsocket Module
 module "vsocket-vpc" {
   source                   = "catonetworks/vsocket-azure/cato"
-  allowed_ports            = var.allowed_ports
-  boot_disk_image          = var.boot_disk_image
-  boot_disk_size           = var.boot_disk_size
-  cato-serial-id           = var.cato-serial-id
-  create_firewall_rule     = var.create_firewall_rule
-  firewall_rule_name       = var.firewall_rule_name
+  token                    = var.cato_token
+  account_id               = var.account_id
+  allowed_ports            = ["22", "443"]
+  create_firewall_rule     = true
+  firewall_rule_name       = "allow-management-access" # Only used if create_firewall_rule = true
   lan_compute_network_id   = google_compute_network.vpc_lan.id
-  lan_network_ip           = var.lan_network_ip
+  lan_network_ip           = "10.2.0.10" 
   lan_subnet_id            = google_compute_subnetwork.subnet_lan.id
-  machine_type             = var.machine_type
-  management_source_ranges = var.management_source_ranges
+  management_source_ranges = ["11.22.33.44/32"] # Only used if create_firewall_rule = true
   mgmt_compute_network_id  = google_compute_network.vpc_mgmt.id
-  mgmt_network_ip          = var.mgmt_network_ip
+  mgmt_network_ip          = "10.0.0.10"
   mgmt_static_ip_address   = google_compute_address.ip_mgmt[0].address
   mgmt_subnet_id           = google_compute_subnetwork.subnet_mgmt.id
-  project                  = var.project
-  region                   = var.region
-  vm_name                  = var.vm_name
+  project                  = "cato-vsocket-deployment"
+  region                   = "us-west1"
+  site_name                = "Cato-GCP-us-west1"
+  site_description         = "GCP Site us-west1"
+  site_location            = {
+    city         = "Los Angeles"
+    country_code = "US"
+    state_code   = "US-CA" ## Optional - for countries with states
+    timezone     = "America/Los_Angeles"
+  }
+  vm_name                  = "gcp-vsocket-instance"
   wan_compute_network_id   = google_compute_network.vpc_wan.id
-  wan_network_ip           = var.wan_network_ip
+  wan_network_ip           = "10.1.0.10"
   wan_static_ip_address    = google_compute_address.ip_wan[0].address
   wan_subnet_id            = google_compute_subnetwork.subnet_wan.id
-  zone                     = var.zone
+  zone                     = "us-west1-a"
+  tags                     = ["customtag1","tcustomtag1est2"]
+  labels                   = {
+    customLabel = "mylabel"
+    customLabel = "mylabel2"
+  }
 }
 ```
