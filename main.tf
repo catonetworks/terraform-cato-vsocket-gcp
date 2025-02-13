@@ -10,44 +10,6 @@ provider "cato" {
   account_id = var.account_id
 }
 
-# # Data sources to fetch existing resources
-# data "google_compute_network" "existing_vpc_mgmt" {
-#   name = var.existing_vpc_mgmt_name
-# }
-
-# data "google_compute_network" "existing_vpc_wan" {
-#   name = var.existing_vpc_wan_name
-# }
-
-# data "google_compute_network" "existing_vpc_lan" {
-#   name = var.existing_vpc_lan_name
-# }
-
-# data "google_compute_subnetwork" "existing_subnet_mgmt" {
-#   name   = var.existing_subnet_mgmt_name
-#   region = var.region
-# }
-
-# data "google_compute_subnetwork" "existing_subnet_wan" {
-#   name   = var.existing_subnet_wan_name
-#   region = var.region
-# }
-
-# data "google_compute_subnetwork" "existing_subnet_lan" {
-#   name   = var.subnet_lan_name
-#   region = var.region
-# }
-
-# data "google_compute_address" "existing_ip_mgmt" {
-#   name   = var.ip_mgmt_name
-#   region = var.region
-# }
-
-# data "google_compute_address" "existing_ip_wan" {
-#   name   = var.ip_wan_name
-#   region = var.region
-# }
-
 resource "cato_socket_site" "gcp-site" {
   connection_type = var.connection_type
   description     = var.site_description
@@ -64,8 +26,7 @@ data "cato_accountSnapshotSite" "gcp-site" {
   id = cato_socket_site.gcp-site.id
 }
 
-
-# firewall.tf
+# Firewall rule
 resource "google_compute_firewall" "allow_ssh_https" {
   count   = var.create_firewall_rule ? 1 : 0
   name    = var.firewall_rule_name
@@ -78,9 +39,6 @@ resource "google_compute_firewall" "allow_ssh_https" {
 
   source_ranges = var.management_source_ranges
   target_tags = var.tags
-  # labels = merge(var.labels,{
-  #   Name = "${var.site_name}-vSocket-fw-rule"
-  # })
 }
 
 # Boot disk
@@ -90,9 +48,6 @@ resource "google_compute_disk" "boot_disk" {
   zone  = var.zone
   size  = var.boot_disk_size
   image = var.boot_disk_image
-  # tags = merge(var.tags,{
-  #   Name = "${var.site_name}-vSocket"
-  # })
 }
 
 # VM Instance
