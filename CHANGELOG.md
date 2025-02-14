@@ -10,3 +10,8 @@
 
 ### Features
 - Added support for tags and labels
+
+## 0.0.3 (2025-02-14)
+
+### Features
+- Updated image path to new vsocket image

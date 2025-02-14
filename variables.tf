@@ -137,7 +137,7 @@ variable "boot_disk_size" {
 variable "boot_disk_image" {
   description = "Boot disk image"
   type        = string
-  default     = "image-production-socket-v22-0-20241231-19122"
+  default     = "projects/cato-vsocket-production/global/images/gcp-socket-image-v22-0-19207"
 }
 
 variable "network_tier" {

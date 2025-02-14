@@ -17,8 +17,8 @@ This module deploys the following resources
 
 ```hcl
 # GCP/Cato vsocket Module
-module "vsocket-vpc" {
-  source                   = "catonetworks/vsocket-azure/cato"
+module "vsocket-gpc" {
+  source                   = "catonetworks/vsocket-gcp/cato"
   token                    = var.cato_token
   account_id               = var.account_id
   allowed_ports            = ["22", "443"]
