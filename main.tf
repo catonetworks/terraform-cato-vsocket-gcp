@@ -50,8 +50,18 @@ resource "google_compute_disk" "boot_disk" {
   image = var.boot_disk_image
 }
 
+resource "null_resource" "destroy_delay" {
+  depends_on = [cato_socket_site.gcp-site]
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "sleep 30"
+  }
+}
+
 # VM Instance
 resource "google_compute_instance" "vsocket" {
+  depends_on = [ cato_socket_site.gcp-site, null_resource.destroy_delay ]
   name         = var.vm_name
   machine_type = var.machine_type
   zone         = var.zone

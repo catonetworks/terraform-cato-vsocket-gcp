@@ -25,6 +25,7 @@ module "vsocket-gpc" {
   create_firewall_rule     = true
   firewall_rule_name       = "allow-management-access" # Only used if create_firewall_rule = true
   lan_compute_network_id   = google_compute_network.vpc_lan.id
+  native_network_range     = "10.2.0.0/24"
   lan_network_ip           = "10.2.0.10" 
   lan_subnet_id            = google_compute_subnetwork.subnet_lan.id
   management_source_ranges = ["11.22.33.44/32"] # Only used if create_firewall_rule = true
