@@ -13,6 +13,128 @@ This module deploys the following resources
 - 1 google_compute_disk
 - 1 google_compute_firewall (optional)
 
+# GCP Network and Resource Dependencies
+
+<details>
+<summary>Create new GCP VPC and network resources</summary>
+
+The following exmaple shows how to create the required resources as new.
+
+```hcl
+# VPC Networks
+resource "google_compute_network" "vpc_mgmt" {
+  name                    = var.vpc_mgmt_name
+  auto_create_subnetworks = false
+}
+
+resource "google_compute_network" "vpc_wan" {
+  name                    = var.vpc_wan_name
+  auto_create_subnetworks = false
+}
+
+resource "google_compute_network" "vpc_lan" {
+  name                    = var.vpc_lan_name
+  auto_create_subnetworks = false
+}
+
+# Subnets
+resource "google_compute_subnetwork" "subnet_mgmt" {
+  name          = var.subnet_mgmt_name
+  ip_cidr_range = var.subnet_mgmt_cidr
+  network       = google_compute_network.vpc_mgmt.id
+  region        = var.region
+}
+
+resource "google_compute_subnetwork" "subnet_wan" {
+  name          = var.subnet_wan_name
+  ip_cidr_range = var.subnet_wan_cidr
+  network       = google_compute_network.vpc_wan.id
+  region        = var.region
+}
+
+resource "google_compute_subnetwork" "subnet_lan" {
+  name          = var.subnet_lan_name
+  ip_cidr_range = var.subnet_lan_cidr
+  network       = google_compute_network.vpc_lan.id
+  region        = var.region
+}
+
+# Static IPs
+resource "google_compute_address" "ip_mgmt" {
+  count        = var.public_ip_mgmt ? 1 : 0
+  name         = var.ip_mgmt_name
+  region       = var.region
+  network_tier = var.network_tier
+}
+
+resource "google_compute_address" "ip_wan" {
+  count        = var.public_ip_wan ? 1 : 0
+  name         = var.ip_wan_name
+  region       = var.region
+  network_tier = var.network_tier
+}
+
+resource "google_compute_address" "ip_lan" {
+  name         = var.ip_lan_name
+  region       = var.region
+  address_type = "INTERNAL"
+  subnetwork   = google_compute_subnetwork.subnet_lan.id
+}
+```
+
+</details>
+
+<details>
+<summary>Use existing GCP VPC and network resources (data sources)</summary>
+
+The following exmaple shows how to use existing resources in GCP retrieving the necessary values using GCP data sources.
+
+```hcl
+# VPC Networks
+data "google_compute_network" "vpc_mgmt" {
+  name                    = var.vpc_mgmt_name
+}
+
+data "google_compute_network" "vpc_wan" {
+  name                    = var.vpc_wan_name
+}
+
+data "google_compute_network" "vpc_lan" {
+  name                    = var.vpc_lan_name
+}
+
+# Subnets
+data "google_compute_subnetwork" "subnet_mgmt" {
+  name          = var.subnet_mgmt_name
+  region        = var.region
+}
+
+data "google_compute_subnetwork" "subnet_wan" {
+  name          = var.subnet_wan_name
+  region        = var.region
+}
+
+data "google_compute_subnetwork" "subnet_lan" {
+  name          = var.subnet_lan_name
+  region        = var.region
+}
+
+# Static IPs
+data "google_compute_address" "ip_mgmt" {
+  name         = var.ip_mgmt_name
+}
+
+data "google_compute_address" "ip_wan" {
+  name         = var.ip_wan_name
+}
+
+data "google_compute_address" "ip_lan" {
+  name         = var.ip_lan_name
+}
+```
+
+</details>
+
 ## Usage
 
 ```hcl
