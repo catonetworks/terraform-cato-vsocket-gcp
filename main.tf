@@ -111,6 +111,9 @@ resource "google_compute_instance" "vsocket" {
     subnetwork = var.lan_subnet_id
     network_ip = var.lan_network_ip
     nic_type   = "GVNIC"
+    access_config {
+      network_tier = var.network_tier
+    }
   }
 
   # Custom metadata with serial id
