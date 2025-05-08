@@ -1,20 +1,4 @@
 # Cato site variables:
-variable "baseurl" {
-  description = "Cato API base URL"
-  type        = string
-  default     = "https://api.catonetworks.com/api/v1/graphql2"
-}
-
-variable "token" {
-  description = "Cato API token"
-  type        = string
-}
-
-variable "account_id" {
-  description = "Cato account ID"
-  type        = number
-}
-
 variable "site_name" {
   description = "Name of the vsocket site"
   type        = string
@@ -58,22 +42,6 @@ variable "native_network_range" {
 	EOT
 }
 
-# variables.tf
-variable "project" {
-  description = "GCP Project ID"
-  type        = string
-}
-
-variable "region" {
-  description = "GCP Region"
-  type        = string
-  default     = "me-west1"
-  validation {
-    condition     = can(regex("^[a-z]+-[a-z]+[0-9]$", var.region))
-    error_message = "Region must be in the format: region-location (e.g., us-central1)."
-  }
-}
-
 variable "zone" {
   description = "GCP Zone"
   type        = string
@@ -95,6 +63,11 @@ variable "lan_compute_network_id" {
   description = "ID of existing LAN Compute Network"
   type        = string
 }
+
+# variable "lan_compute_network_name" {
+#   description = "ID of existing LAN Compute Network"
+#   type        = string
+# }
 
 # Existing Subnet Names (REQUIRED)
 variable "mgmt_subnet_id" {
@@ -183,7 +156,7 @@ variable "machine_type" {
     condition     = can(regex("^[a-z][0-9]-[a-z]+-[0-9]+$", var.machine_type))
     error_message = "Machine type must be in the format: family-series-size (e.g., n2-standard-4)."
   }
-  default     =  "n2-standard-4"
+  default = "n2-standard-4"
 }
 
 # Public IP Configuration
@@ -200,13 +173,23 @@ variable "public_ip_wan" {
 }
 
 # Firewall Configuration
-variable "firewall_rule_name" {
-  description = "Name of the firewall rule (1-63 chars, lowercase letters, numbers, or hyphens)"
+variable "wan_firewall_rule_name" {
+  description = "Name of the external firewall rule (1-63 chars, lowercase letters, numbers, or hyphens)"
   type        = string
   validation {
-    condition     = can(regex("^[a-z][a-z0-9-]{0,61}[a-z0-9]$", var.firewall_rule_name))
+    condition     = can(regex("^[a-z][a-z0-9-]{0,61}[a-z0-9]$", var.wan_firewall_rule_name))
     error_message = "Firewall rule name must be 1-63 characters, start with a letter, and contain only lowercase letters, numbers, or hyphens."
   }
+}
+
+variable "lan_firewall_rule_name" {
+  description = "Name of the internal firewall rule (1-63 chars, lowercase letters, numbers, or hyphens)"
+  type        = string
+  validation {
+    condition     = can(regex("^[a-z][a-z0-9-]{0,61}[a-z0-9]$", var.lan_firewall_rule_name))
+    error_message = "Firewall rule name must be 1-63 characters, start with a letter, and contain only lowercase letters, numbers, or hyphens."
+  }
+  default = "allow-rfc1918-to-cato-lan"
 }
 
 variable "allowed_ports" {
@@ -243,4 +226,16 @@ variable "tags" {
   description = "Tags to be appended to GCP resources"
   type        = list(string)
   default     = []
+}
+
+variable "license_id" {
+  description = "The license ID for the Cato vSocket of license type CATO_SITE, CATO_SSE_SITE, CATO_PB, CATO_PB_SSE.  Example License ID value: 'abcde123-abcd-1234-abcd-abcde1234567'.  Note that licenses are for commercial accounts, and not supported for trial accounts."
+  type        = string
+  default     = null
+}
+
+variable "license_bw" {
+  description = "The license bandwidth number for the cato site, specifying bandwidth ONLY applies for pooled licenses.  For a standard site license that is not pooled, leave this value null. Must be a number greater than 0 and an increment of 10."
+  type        = string
+  default     = null
 }

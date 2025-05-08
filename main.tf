@@ -1,15 +1,4 @@
 # main.tf
-provider "google" {
-  project = var.project
-  region  = var.region
-}
-
-provider "cato" {
-  baseurl    = var.baseurl
-  token      = var.token
-  account_id = var.account_id
-}
-
 resource "cato_socket_site" "gcp-site" {
   connection_type = var.connection_type
   description     = var.site_description
@@ -29,7 +18,7 @@ data "cato_accountSnapshotSite" "gcp-site" {
 # Firewall rule
 resource "google_compute_firewall" "allow_ssh_https" {
   count   = var.create_firewall_rule ? 1 : 0
-  name    = var.firewall_rule_name
+  name    = var.wan_firewall_rule_name
   network = var.mgmt_compute_network_id
 
   allow {
@@ -38,7 +27,7 @@ resource "google_compute_firewall" "allow_ssh_https" {
   }
 
   source_ranges = var.management_source_ranges
-  target_tags = var.tags
+  target_tags   = var.tags
 }
 
 # Boot disk
@@ -61,7 +50,7 @@ resource "null_resource" "destroy_delay" {
 
 # VM Instance
 resource "google_compute_instance" "vsocket" {
-  depends_on = [ cato_socket_site.gcp-site, null_resource.destroy_delay ]
+  depends_on   = [cato_socket_site.gcp-site, null_resource.destroy_delay]
   name         = var.vm_name
   machine_type = var.machine_type
   zone         = var.zone
@@ -131,7 +120,58 @@ resource "google_compute_instance" "vsocket" {
   }
 
   tags = var.tags
-  labels = merge(var.labels,{
+  labels = merge(var.labels, {
     name = lower("${var.site_name}-vsocket")
   })
+}
+
+resource "google_compute_firewall" "allow_rfc1918" {
+  name    = var.lan_firewall_rule_name
+  network = var.lan_subnet_id
+  allow {
+    protocol = "all" # Allows all protocols (TCP, UDP, ICMP, etc.)
+  }
+  source_ranges = [
+    "10.0.0.0/8",
+    "172.16.0.0/12",
+    "192.168.0.0/16"
+  ]
+  priority    = 1000 # Standard priority (lower number = higher priority)
+  direction   = "INGRESS"
+  description = "Allow all RFC1918 private IP ranges to access the cato-lan-vpc network"
+}
+
+# data "google_compute_subnetwork" "lan" {
+#   name    = "ba-lan-subnet"
+#   region  = var.region
+# }
+
+# resource "google_compute_route" "cato-10-0-0-0-routes" {
+#   name        = "cato-10-0-0-0-routes"
+#   network     = data.google_compute_subnetwork.lan.self_link
+#   dest_range  = "10.0.0.0/8"
+#   next_hop_ip = var.lan_network_ip
+#   priority    = 1000
+# }
+# resource "google_compute_route" "cato-172-16-0-0-routes" {
+#   name        = "cato-172-16-0-0-routes"
+#   network     = data.google_compute_subnetwork.lan.self_link
+#   dest_range  = "172.16.0.0/12"
+#   next_hop_ip = var.lan_network_ip
+#   priority    = 1000
+# }
+# resource "google_compute_route" "cato-192-168-0-0-routes" {
+#   name        = "cato-192-168-0-0-routes"
+#   network     = data.google_compute_subnetwork.lan.self_link
+#   dest_range  = "192.168.0.0/16"
+#   next_hop_ip = var.lan_network_ip
+#   priority    = 1000
+# }
+
+resource "cato_license" "license" {
+  depends_on = [cato_socket_site.gcp-site]
+  count      = var.license_id == null ? 0 : 1
+  site_id    = cato_socket_site.gcp-site.id
+  license_id = var.license_id
+  bw         = var.license_bw == null ? null : var.license_bw
 }
