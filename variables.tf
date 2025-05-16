@@ -139,16 +139,6 @@ variable "lan_network_ip" {
   type        = string
 }
 
-# VM Configuration
-variable "vm_name" {
-  description = "VM Instance name (must be 1-63 characters, lowercase letters, numbers, or hyphens)"
-  type        = string
-  validation {
-    condition     = can(regex("^[a-z][a-z0-9-]{0,61}[a-z0-9]$", var.vm_name))
-    error_message = "VM name must be 1-63 characters long, start with a letter, and contain only lowercase letters, numbers, or hyphens."
-  }
-}
-
 variable "machine_type" {
   description = "Machine type"
   type        = string
@@ -180,6 +170,7 @@ variable "wan_firewall_rule_name" {
     condition     = can(regex("^[a-z][a-z0-9-]{0,61}[a-z0-9]$", var.wan_firewall_rule_name))
     error_message = "Firewall rule name must be 1-63 characters, start with a letter, and contain only lowercase letters, numbers, or hyphens."
   }
+  default = "allow-management-access"
 }
 
 variable "lan_firewall_rule_name" {
@@ -193,21 +184,23 @@ variable "lan_firewall_rule_name" {
 }
 
 variable "allowed_ports" {
-  description = "List of ports to allow through the firewall (Required)"
+  description = "List of ports to allow through the firewall"
   type        = list(string)
-  validation {
-    condition     = length(var.allowed_ports) > 0
-    error_message = "At least one port must be specified."
-  }
+  default = null
+  # validation {
+  #   condition     = length(var.allowed_ports) > 0
+  #   error_message = "At least one port must be specified."
+  # }
 }
 
 variable "management_source_ranges" {
-  description = "Source IP ranges that can access the instance via SSH/HTTPS (Required)"
+  description = "Source IP ranges that can access the instance via SSH/HTTPS"
   type        = list(string)
-  validation {
-    condition     = length(var.management_source_ranges) > 0
-    error_message = "At least one source IP range must be provided for management access."
-  }
+  default = null
+  # validation {
+  #   condition     = length(var.management_source_ranges) > 0
+  #   error_message = "At least one source IP range must be provided for management access."
+  # }
 }
 
 variable "create_firewall_rule" {

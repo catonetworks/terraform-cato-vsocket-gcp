@@ -1,3 +1,6 @@
+locals {
+  clean_site_name = regex("^[a-z][-a-z0-9]{0,61}[a-z0-9]?$",replace(lower(var.site_name), "_", "-"))
+}
 # main.tf
 resource "cato_socket_site" "gcp-site" {
   connection_type = var.connection_type
@@ -32,7 +35,7 @@ resource "google_compute_firewall" "allow_ssh_https" {
 
 # Boot disk
 resource "google_compute_disk" "boot_disk" {
-  name  = "${var.vm_name}-boot-disk"
+  name  = "${local.clean_site_name}-boot-disk"
   type  = "pd-balanced"
   zone  = var.zone
   size  = var.boot_disk_size
@@ -51,7 +54,7 @@ resource "null_resource" "destroy_delay" {
 # VM Instance
 resource "google_compute_instance" "vsocket" {
   depends_on   = [cato_socket_site.gcp-site, null_resource.destroy_delay]
-  name         = var.vm_name
+  name         = "${local.clean_site_name}-vsocket"
   machine_type = var.machine_type
   zone         = var.zone
 
