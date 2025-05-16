@@ -186,7 +186,7 @@ variable "lan_firewall_rule_name" {
 variable "allowed_ports" {
   description = "List of ports to allow through the firewall"
   type        = list(string)
-  default = null
+  default     = null
   # validation {
   #   condition     = length(var.allowed_ports) > 0
   #   error_message = "At least one port must be specified."
@@ -196,7 +196,7 @@ variable "allowed_ports" {
 variable "management_source_ranges" {
   description = "Source IP ranges that can access the instance via SSH/HTTPS"
   type        = list(string)
-  default = null
+  default     = null
   # validation {
   #   condition     = length(var.management_source_ranges) > 0
   #   error_message = "At least one source IP range must be provided for management access."

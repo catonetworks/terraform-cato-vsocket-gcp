@@ -1,5 +1,5 @@
 locals {
-  clean_site_name = regex("^[a-z][-a-z0-9]{0,61}[a-z0-9]?$",replace(lower(var.site_name), "_", "-"))
+  clean_site_name = regex("^[a-z][-a-z0-9]{0,61}[a-z0-9]?$", replace(lower(var.site_name), "_", "-"))
 }
 # main.tf
 resource "cato_socket_site" "gcp-site" {

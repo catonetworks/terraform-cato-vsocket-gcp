@@ -225,7 +225,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_allowed_ports"></a> [allowed\_ports](#input\_allowed\_ports) | List of ports to allow through the firewall (Required) | `list(string)` | n/a | yes |
+| <a name="input_allowed_ports"></a> [allowed\_ports](#input\_allowed\_ports) | List of ports to allow through the firewall | `list(string)` | `null` | no |
 | <a name="input_boot_disk_image"></a> [boot\_disk\_image](#input\_boot\_disk\_image) | Boot disk image | `string` | `"projects/cato-vsocket-production/global/images/gcp-socket-image-v22-0-19207"` | no |
 | <a name="input_boot_disk_size"></a> [boot\_disk\_size](#input\_boot\_disk\_size) | Boot disk size in GB (minimum 10 GB) | `number` | `10` | no |
 | <a name="input_connection_type"></a> [connection\_type](#input\_connection\_type) | Model of Cato vsocket | `string` | `"SOCKET_GCP1500"` | no |
@@ -238,7 +238,7 @@ No modules.
 | <a name="input_license_bw"></a> [license\_bw](#input\_license\_bw) | The license bandwidth number for the cato site, specifying bandwidth ONLY applies for pooled licenses.  For a standard site license that is not pooled, leave this value null. Must be a number greater than 0 and an increment of 10. | `string` | `null` | no |
 | <a name="input_license_id"></a> [license\_id](#input\_license\_id) | The license ID for the Cato vSocket of license type CATO\_SITE, CATO\_SSE\_SITE, CATO\_PB, CATO\_PB\_SSE.  Example License ID value: 'abcde123-abcd-1234-abcd-abcde1234567'.  Note that licenses are for commercial accounts, and not supported for trial accounts. | `string` | `null` | no |
 | <a name="input_machine_type"></a> [machine\_type](#input\_machine\_type) | Machine type | `string` | `"n2-standard-4"` | no |
-| <a name="input_management_source_ranges"></a> [management\_source\_ranges](#input\_management\_source\_ranges) | Source IP ranges that can access the instance via SSH/HTTPS (Required) | `list(string)` | n/a | yes |
+| <a name="input_management_source_ranges"></a> [management\_source\_ranges](#input\_management\_source\_ranges) | Source IP ranges that can access the instance via SSH/HTTPS | `list(string)` | `null` | no |
 | <a name="input_mgmt_compute_network_id"></a> [mgmt\_compute\_network\_id](#input\_mgmt\_compute\_network\_id) | ID of existing Management Compute Network | `string` | n/a | yes |
 | <a name="input_mgmt_network_ip"></a> [mgmt\_network\_ip](#input\_mgmt\_network\_ip) | Management network IP | `string` | n/a | yes |
 | <a name="input_mgmt_static_ip_address"></a> [mgmt\_static\_ip\_address](#input\_mgmt\_static\_ip\_address) | Name of existing Management Static IP | `string` | n/a | yes |
@@ -252,9 +252,8 @@ No modules.
 | <a name="input_site_name"></a> [site\_name](#input\_site\_name) | Name of the vsocket site | `string` | n/a | yes |
 | <a name="input_site_type"></a> [site\_type](#input\_site\_type) | The type of the site | `string` | `"CLOUD_DC"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to be appended to GCP resources | `list(string)` | `[]` | no |
-| <a name="input_vm_name"></a> [vm\_name](#input\_vm\_name) | VM Instance name (must be 1-63 characters, lowercase letters, numbers, or hyphens) | `string` | n/a | yes |
 | <a name="input_wan_compute_network_id"></a> [wan\_compute\_network\_id](#input\_wan\_compute\_network\_id) | ID of existing WAN Compute Network | `string` | n/a | yes |
-| <a name="input_wan_firewall_rule_name"></a> [wan\_firewall\_rule\_name](#input\_wan\_firewall\_rule\_name) | Name of the external firewall rule (1-63 chars, lowercase letters, numbers, or hyphens) | `string` | n/a | yes |
+| <a name="input_wan_firewall_rule_name"></a> [wan\_firewall\_rule\_name](#input\_wan\_firewall\_rule\_name) | Name of the external firewall rule (1-63 chars, lowercase letters, numbers, or hyphens) | `string` | `"allow-management-access"` | no |
 | <a name="input_wan_network_ip"></a> [wan\_network\_ip](#input\_wan\_network\_ip) | WAN network IP | `string` | n/a | yes |
 | <a name="input_wan_static_ip_address"></a> [wan\_static\_ip\_address](#input\_wan\_static\_ip\_address) | Name of existing WAN Static IP | `string` | n/a | yes |
 | <a name="input_wan_subnet_id"></a> [wan\_subnet\_id](#input\_wan\_subnet\_id) | ID of existing WAN Subnet | `string` | n/a | yes |
