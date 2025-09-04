@@ -25,3 +25,9 @@
 
 ### Features
 - Removed VM name using site_name to name vsocket instance to align with module design for all clouds, removed validation for optional variables which default to null.
+
+## 0.0.9 (2025-09-04)
+
+### Features
+- Fixed issue with private IP, added readme examples to show how to configure
+

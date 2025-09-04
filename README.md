@@ -149,7 +149,7 @@ provider "cato" {
 }
 
 # GCP/Cato vsocket Module
-module "vsocket-gpc" {
+module "vsocket-gpc-external-ip" {
   source                   = "catonetworks/vsocket-gcp/cato"
   token                    = var.cato_token
   account_id               = var.account_id
@@ -183,11 +183,310 @@ module "vsocket-gpc" {
   zone                     = "us-west1-a"
   tags                     = ["customtag1","tcustomtag1est2"]
   labels                   = {
-    customLabel = "mylabel"
-    customLabel = "mylabel2"
+    customlabel1 = "mylabel"
+    customlabel2 = "mylabel2"
   }
 }
+
 ```
+
+<details>
+<summary>Example usage for private IP using NAT for WAN interface</summary>
+
+The below example shows how to use native GCP cloud NAT and Router to support private IP on the virtual socket for WAN interfaces.
+
+## Usage
+
+```hcl
+# Provider definition
+provider "google" {
+  project = var.project
+  region  = var.region
+}
+
+provider "cato" {
+  baseurl    = var.baseurl
+  token      = var.token
+  account_id = var.account_id
+}
+
+# Example variable definition
+variable "project" {
+  description = "Name of the GCP project"
+  type        = string
+}
+
+variable "region" {
+  description = "Name of the GCP region"
+  type        = string
+}
+
+variable "cato_token" {
+  description = "API Token for the CMA tenant"
+  type        = string
+  sensitive   = true
+}
+
+variable "account_id" {
+  description = "Account ID"
+  type        = number
+}
+
+variable "baseurl" {
+  description = "Base URL for the API call"
+  type        = string
+  default     = "https://api.catonetworks.com/api/v1/graphql2"
+  # For US1 CMA, use https://api.us1.catonetworks.com/api/v1/graphql2
+}
+
+variable "zone" {
+  description = "GCP Zone"
+  type        = string
+  default     = "me-west1-a"
+}
+
+# VPC Names
+variable "vpc_mgmt_name" {
+  description = "Management VPC Name"
+  type        = string
+}
+
+variable "vpc_wan_name" {
+  description = "WAN VPC Name"
+  type        = string
+}
+
+variable "vpc_lan_name" {
+  description = "LAN VPC Name"
+  type        = string
+}
+
+# Subnet IPv4 CIDRs
+variable "subnet_mgmt_cidr" {
+  description = "CIDR block for the management subnet"
+  type        = string
+
+  validation {
+    condition     = can(cidrnetmask(var.subnet_mgmt_cidr))
+    error_message = "The value must be a valid CIDR block, e.g., 10.0.0.0/24."
+  }
+}
+
+variable "subnet_wan_cidr" {
+  description = "CIDR block for the WAN subnet"
+  type        = string
+
+  validation {
+    condition     = can(cidrnetmask(var.subnet_wan_cidr))
+    error_message = "The value must be a valid CIDR block, e.g., 10.0.1.0/24."
+  }
+}
+
+variable "subnet_lan_cidr" {
+  description = "CIDR block for the LAN subnet"
+  type        = string
+
+  validation {
+    condition     = can(cidrnetmask(var.subnet_lan_cidr))
+    error_message = "The value must be a valid CIDR block, e.g., 10.0.2.0/24."
+  }
+}
+
+# Subnet Names (REQUIRED)
+variable "subnet_mgmt_name" {
+  description = "Name of Management Subnet"
+  type        = string
+}
+
+variable "subnet_wan_name" {
+  description = "Name of WAN Subnet"
+  type        = string
+}
+
+variable "subnet_lan_name" {
+  description = "Name of LAN Subnet"
+  type        = string
+}
+
+# GCP IP Names (REQUIRED)
+variable "ip_mgmt_name" {
+  description = "Name of Management Static IP"
+  type        = string
+}
+
+variable "ip_wan_name" {
+  description = "Name of WAN Static IP"
+  type        = string
+}
+
+variable "ip_lan_name" {
+  description = "Name of LAN Static IP"
+  type        = string
+}
+
+variable "network_tier" {
+  description = "Network tier for the public IP"
+  type        = string
+  default     = "STANDARD"
+}
+
+# Network IP Configuration (REQUIRED)
+variable "mgmt_network_ip" {
+  description = "Management network IP"
+  type        = string
+}
+
+variable "wan_network_ip" {
+  description = "WAN network IP"
+  type        = string
+}
+
+variable "lan_network_ip" {
+  description = "LAN network IP"
+  type        = string
+}
+
+# Public IP Configuration
+variable "public_ip_mgmt" {
+  description = "Whether to assign the existing static IP to management interface. If false, no public IP will be assigned."
+  type        = bool
+  default     = true
+}
+
+variable "public_ip_wan" {
+  description = "Whether to assign the existing static IP to WAN interface. If false, no public IP will be assigned."
+  type        = bool
+  default     = true
+}
+
+# VPC Networks
+resource "google_compute_network" "vpc_mgmt" {
+  name                    = var.vpc_mgmt_name
+  auto_create_subnetworks = false
+}
+
+resource "google_compute_network" "vpc_wan" {
+  name                    = var.vpc_wan_name
+  auto_create_subnetworks = false
+}
+
+resource "google_compute_network" "vpc_lan" {
+  name                    = var.vpc_lan_name
+  auto_create_subnetworks = false
+}
+
+# Subnets
+resource "google_compute_subnetwork" "subnet_mgmt" {
+  name          = var.subnet_mgmt_name
+  ip_cidr_range = var.subnet_mgmt_cidr
+  network       = google_compute_network.vpc_mgmt.id
+  region        = var.region
+}
+
+resource "google_compute_subnetwork" "subnet_wan" {
+  name          = var.subnet_wan_name
+  ip_cidr_range = var.subnet_wan_cidr
+  network       = google_compute_network.vpc_wan.id
+  region        = var.region
+}
+
+resource "google_compute_subnetwork" "subnet_lan" {
+  name          = var.subnet_lan_name
+  ip_cidr_range = var.subnet_lan_cidr
+  network       = google_compute_network.vpc_lan.id
+  region        = var.region
+}
+
+# Static IPs
+resource "google_compute_address" "ip_mgmt" {
+  name         = var.ip_mgmt_name
+  region       = var.region
+  address_type = "INTERNAL"
+  subnetwork   = google_compute_subnetwork.subnet_mgmt.id
+  address      = var.mgmt_network_ip
+}
+
+resource "google_compute_address" "ip_wan" {
+  name         = var.ip_wan_name
+  region       = var.region
+  address_type = "INTERNAL"
+  subnetwork   = google_compute_subnetwork.subnet_wan.id
+  address      = var.wan_network_ip
+}
+
+resource "google_compute_address" "ip_lan" {
+  name         = var.ip_lan_name
+  region       = var.region
+  address_type = "INTERNAL"
+  subnetwork   = google_compute_subnetwork.subnet_lan.id
+}
+
+# Cloud Router for the WAN VPC
+resource "google_compute_router" "wan_router" {
+  name    = "${var.vpc_wan_name}-router"
+  region  = var.region
+  network = google_compute_network.vpc_wan.self_link
+}
+
+# Cloud NAT for private egress on the WAN subnet
+resource "google_compute_router_nat" "wan_nat" {
+  name                               = "${var.vpc_wan_name}-nat"
+  region                             = var.region
+  router                             = google_compute_router.wan_router.name
+  nat_ip_allocate_option             = "AUTO_ONLY" # Or "MANUAL_ONLY" if you attach reserved externals
+  source_subnetwork_ip_ranges_to_nat = "LIST_OF_SUBNETWORKS"
+
+  subnetwork {
+    name                    = google_compute_subnetwork.subnet_wan.self_link
+    source_ip_ranges_to_nat = ["ALL_IP_RANGES"]
+  }
+
+  log_config {
+    enable = true
+    filter = "ERRORS_ONLY"
+  }
+}
+
+# GCP/Cato vsocket Module
+module "vsocket-gcp" {
+  source                  = "catonetworks/vsocket-gcp/cato"
+  zone                    = var.zone
+  create_firewall_rule    = false
+  lan_compute_network_id  = google_compute_network.vpc_lan.id
+  native_network_range    = var.subnet_lan_cidr
+  lan_network_ip          = var.lan_network_ip
+  lan_subnet_id           = google_compute_subnetwork.subnet_lan.id
+  mgmt_compute_network_id = google_compute_network.vpc_mgmt.id
+  mgmt_network_ip         = var.mgmt_network_ip
+  public_ip_mgmt          = var.public_ip_mgmt
+  public_ip_wan           = var.public_ip_wan
+  mgmt_static_ip_address  = google_compute_address.ip_mgmt.address
+  mgmt_subnet_id          = google_compute_subnetwork.subnet_mgmt.id
+  site_name               = "Cato-GCP-us-central1"
+  site_description        = "GCP Site us-central1"
+  site_location = {
+    city         = "Council Bluffs"
+    country_code = "US"
+    state_code   = "US-IA" ## Optional - for countries with states
+    timezone     = "America/Chicago"
+  }
+  wan_compute_network_id = google_compute_network.vpc_wan.id
+  wan_network_ip         = var.wan_network_ip
+  wan_static_ip_address  = google_compute_address.ip_wan.address
+
+  wan_subnet_id = google_compute_subnetwork.subnet_wan.id
+  tags          = ["iap", "cato", "cato-wan", "cato-mgmt", "cato-lan"]
+  labels = {
+    customlabel1 = "lb-cato"
+    customlabel2 = "lb-cato-wan"
+    customlabel3 = "lb-cato-mgmt"
+    customlabel4 = "lb-cato-lan"
+  }
+}
+
+```
+
+</details>
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
