@@ -1,5 +1,5 @@
 locals {
-  clean_site_name = regex("^[a-z][-a-z0-9]{0,61}[a-z0-9]?$",replace(lower(var.site_name), "_", "-"))
+  clean_site_name = regex("^[a-z][-a-z0-9]{0,61}[a-z0-9]?$", replace(lower(var.site_name), "_", "-"))
 }
 # main.tf
 resource "cato_socket_site" "gcp-site" {
@@ -103,9 +103,6 @@ resource "google_compute_instance" "vsocket" {
     subnetwork = var.lan_subnet_id
     network_ip = var.lan_network_ip
     nic_type   = "GVNIC"
-    access_config {
-      network_tier = var.network_tier
-    }
   }
 
   # Custom metadata with serial id
@@ -129,6 +126,7 @@ resource "google_compute_instance" "vsocket" {
 }
 
 resource "google_compute_firewall" "allow_rfc1918" {
+  count   = var.create_firewall_rule ? 1 : 0
   name    = var.lan_firewall_rule_name
   network = var.lan_subnet_id
   allow {
@@ -143,33 +141,6 @@ resource "google_compute_firewall" "allow_rfc1918" {
   direction   = "INGRESS"
   description = "Allow all RFC1918 private IP ranges to access the cato-lan-vpc network"
 }
-
-# data "google_compute_subnetwork" "lan" {
-#   name    = "ba-lan-subnet"
-#   region  = var.region
-# }
-
-# resource "google_compute_route" "cato-10-0-0-0-routes" {
-#   name        = "cato-10-0-0-0-routes"
-#   network     = data.google_compute_subnetwork.lan.self_link
-#   dest_range  = "10.0.0.0/8"
-#   next_hop_ip = var.lan_network_ip
-#   priority    = 1000
-# }
-# resource "google_compute_route" "cato-172-16-0-0-routes" {
-#   name        = "cato-172-16-0-0-routes"
-#   network     = data.google_compute_subnetwork.lan.self_link
-#   dest_range  = "172.16.0.0/12"
-#   next_hop_ip = var.lan_network_ip
-#   priority    = 1000
-# }
-# resource "google_compute_route" "cato-192-168-0-0-routes" {
-#   name        = "cato-192-168-0-0-routes"
-#   network     = data.google_compute_subnetwork.lan.self_link
-#   dest_range  = "192.168.0.0/16"
-#   next_hop_ip = var.lan_network_ip
-#   priority    = 1000
-# }
 
 resource "cato_license" "license" {
   depends_on = [cato_socket_site.gcp-site]

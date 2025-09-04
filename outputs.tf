@@ -33,10 +33,10 @@ output "vm_instance_name" {
   value       = google_compute_instance.vsocket.name
 }
 
-output "vm_instance_self_link" {
-  description = "Self-link for the VM instance"
-  value       = google_compute_instance.vsocket.self_link
-}
+# output "vm_instance_self_link" {
+#   description = "Self-link for the VM instance"
+#   value       = google_compute_instance.vsocket.self_link
+# }
 
 output "vm_mgmt_network_ip" {
   description = "Management network private IP of the VM"
@@ -70,12 +70,12 @@ output "vm_labels" {
 
 output "firewall_rule_rfc1918" {
   description = "Firewall rule name for RFC1918 private IP ranges"
-  value       = google_compute_firewall.allow_rfc1918.name
+  value       = try(google_compute_firewall.allow_rfc1918[0].name, "Firewall Disabled")
 }
 
 output "firewall_rule_rfc1918_self_link" {
   description = "Self-link of the RFC1918 firewall rule"
-  value       = google_compute_firewall.allow_rfc1918.self_link
+  value       = try(google_compute_firewall.allow_rfc1918[0].self_link, "Firewall Disabled")
 }
 
 output "cato_license_site" {
