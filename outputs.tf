@@ -33,7 +33,7 @@ output "vm_instance_name" {
   value       = google_compute_instance.vsocket.name
 }
 
-output "vm_instance_id" { 
+output "vm_instance_id" {
   value = google_compute_instance.vsocket.id
 }
 

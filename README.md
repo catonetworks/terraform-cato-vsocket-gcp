@@ -571,8 +571,8 @@ No modules.
 | <a name="output_firewall_rule_name"></a> [firewall\_rule\_name](#output\_firewall\_rule\_name) | Name of the created firewall rule |
 | <a name="output_firewall_rule_rfc1918"></a> [firewall\_rule\_rfc1918](#output\_firewall\_rule\_rfc1918) | Firewall rule name for RFC1918 private IP ranges |
 | <a name="output_firewall_rule_rfc1918_self_link"></a> [firewall\_rule\_rfc1918\_self\_link](#output\_firewall\_rule\_rfc1918\_self\_link) | Self-link of the RFC1918 firewall rule |
+| <a name="output_vm_instance_id"></a> [vm\_instance\_id](#output\_vm\_instance\_id) | n/a |
 | <a name="output_vm_instance_name"></a> [vm\_instance\_name](#output\_vm\_instance\_name) | Name of the VM instance |
-| <a name="output_vm_instance_self_link"></a> [vm\_instance\_self\_link](#output\_vm\_instance\_self\_link) | Self-link for the VM instance |
 | <a name="output_vm_labels"></a> [vm\_labels](#output\_vm\_labels) | Labels assigned to the VM |
 | <a name="output_vm_lan_network_ip"></a> [vm\_lan\_network\_ip](#output\_vm\_lan\_network\_ip) | LAN network private IP of the VM |
 | <a name="output_vm_mgmt_network_ip"></a> [vm\_mgmt\_network\_ip](#output\_vm\_mgmt\_network\_ip) | Management network private IP of the VM |

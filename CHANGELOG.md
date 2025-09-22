@@ -31,3 +31,7 @@
 ### Features
 - Fixed issue with private IP, added readme examples to show how to configure
 
+## 0.0.10 (2025-09-22)
+
+### Features
+- Updated outputs to include instance_id, and removed legacy reference to vm_instance_self_link
