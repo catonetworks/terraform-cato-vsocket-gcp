@@ -492,14 +492,15 @@ module "vsocket-gcp" {
 ## Requirements
 
 | Name | Version |
-|------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13 |
+| ---- | ------- |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5 |
+| <a name="requirement_cato"></a> [cato](#requirement\_cato) | >= 0.0.70 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
-| <a name="provider_cato"></a> [cato](#provider\_cato) | n/a |
+| ---- | ------- |
+| <a name="provider_cato"></a> [cato](#provider\_cato) | >= 0.0.70 |
 | <a name="provider_google"></a> [google](#provider\_google) | n/a |
 | <a name="provider_null"></a> [null](#provider\_null) | n/a |
 
@@ -510,7 +511,7 @@ No modules.
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [cato_license.license](https://registry.terraform.io/providers/catonetworks/cato/latest/docs/resources/license) | resource |
 | [cato_socket_site.gcp-site](https://registry.terraform.io/providers/catonetworks/cato/latest/docs/resources/socket_site) | resource |
 | [google_compute_disk.boot_disk](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_disk) | resource |
@@ -523,7 +524,7 @@ No modules.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_allowed_ports"></a> [allowed\_ports](#input\_allowed\_ports) | List of ports to allow through the firewall | `list(string)` | `null` | no |
 | <a name="input_boot_disk_image"></a> [boot\_disk\_image](#input\_boot\_disk\_image) | Boot disk image | `string` | `"projects/cato-vsocket-production/global/images/gcp-socket-image-v22-0-19207"` | no |
 | <a name="input_boot_disk_size"></a> [boot\_disk\_size](#input\_boot\_disk\_size) | Boot disk size in GB (minimum 10 GB) | `number` | `10` | no |
@@ -561,7 +562,7 @@ No modules.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_boot_disk_name"></a> [boot\_disk\_name](#output\_boot\_disk\_name) | Boot disk name for the VM |
 | <a name="output_boot_disk_self_link"></a> [boot\_disk\_self\_link](#output\_boot\_disk\_self\_link) | Self-link for the boot disk |
 | <a name="output_cato_license_site"></a> [cato\_license\_site](#output\_cato\_license\_site) | n/a |
