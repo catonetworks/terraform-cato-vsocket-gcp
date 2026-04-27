@@ -232,3 +232,12 @@ variable "license_bw" {
   type        = string
   default     = null
 }
+
+variable "region" {
+  description = "GCP Region"
+  type        = string
+  validation {
+    condition     = can(regex("^[a-z]+-[a-z]+[0-9]$", var.region))
+    error_message = "Region must be in the format: region-location (e.g., us-central1)."
+  }
+}
