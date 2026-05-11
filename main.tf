@@ -10,7 +10,7 @@ resource "cato_socket_site" "gcp-site" {
     native_network_range = var.native_network_range
     local_ip             = var.lan_network_ip
   }
-  site_location = var.site_location
+  site_location = local.cur_site_location
   site_type     = var.site_type
 }
 

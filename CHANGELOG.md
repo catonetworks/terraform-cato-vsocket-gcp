@@ -35,3 +35,13 @@
 
 ### Features
 - Updated outputs to include instance_id, and removed legacy reference to vm_instance_self_link
+
+## 0.0.11 (2026-05-07)
+
+### Features
+- Updated minimum cato provider version requirement to version 0.0.73
+- Added `region` variable for GCP region input with format validation
+- Added automatic site location resolution from GCP region using a new hardcoded mapping
+- Mapping covers all major GCP regions across North America, Canada, Europe, Asia Pacific (including Australia and India), Middle East, Africa, and South America
+- Eliminates the need to manually specify `site_location` for supported GCP regions
+- User-provided `site_location` values still take precedence over the auto-resolved defaults
