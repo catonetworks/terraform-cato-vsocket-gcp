@@ -13,6 +13,11 @@ output "cato_serial_id" {
   value       = try(data.cato_accountSnapshotSite.gcp-site.info.sockets[0].serial, "N/A")
 }
 
+output "cato_lan_interface_id" {
+  description = "LAN interface ID of the Cato Site Socket"
+  value       = cato_socket_site.gcp-site.native_range.interface_id
+}
+
 output "firewall_rule_name" {
   description = "Name of the created firewall rule"
   value       = try(google_compute_firewall.allow_ssh_https[0].name, "No Firewall Rule Created")
